@@ -1,25 +1,50 @@
-; 512-byte MBR bootloader, loads kernel sector
+; Silver System bootloader (512-byte MBR compatible)
+; Loads 16 sectors of kernel from disk to 0000:8000 and jumps to it.
 org 0x7C00
+bits 16
 
 start:
-    mov ah, 0x02             ; BIOS read sector
-    mov al, 1                ; Read 1 sector (bootloader loads kernel sector 2)
-    mov ch, 0                ; Cylinder 0
-    mov cl, 2                ; Sector 2
-    mov dh, 0                ; Head 0
-    mov dl, 0x80             ; HDD (or 0x00 for floppy)
-    mov bx, 0x8000           ; Destination: 0x8000
-    int 0x13                 ; BIOS disk read
+    cli
+    xor ax, ax
+    mov ds, ax
+    mov es, ax
+    mov ss, ax
+    mov sp, 0x7C00
+    sti
 
-    jc disk_error            ; Jump if error
+    mov [boot_drive], dl
 
-    jmp 0x8000               ; Jump to kernel!
+    mov ah, 0x02            ; BIOS read sectors
+    mov al, 40              ; number of sectors
+    mov ch, 0               ; cylinder
+    mov cl, 2               ; start sector (after boot sector)
+    mov dh, 0               ; head
+    mov dl, [boot_drive]
+    mov bx, 0x8000          ; destination offset
+    int 0x13
+    jc disk_error
+
+    jmp 0x0000:0x8000
 
 disk_error:
-    mov ah, 0x0E
-    mov al, 'E'
-    int 0x10
+    mov si, error_msg
+    call print_string
     hlt
+
+print_string:
+.next:
+    lodsb
+    test al, al
+    jz .done
+    mov ah, 0x0E
+    mov bx, 0x0007
+    int 0x10
+    jmp .next
+.done:
+    ret
+
+boot_drive db 0
+error_msg db 'Boot error',0
 
 times 510-($-$$) db 0
 dw 0xAA55
