@@ -29,12 +29,11 @@ Silver System now boots into a **real VGA graphical desktop** (320x200x256, Mode
 - `D` Redraw desktop
 - `ESC` Reboot
 
-## Build (Linux/macOS)
+## Build
 
 Requirements:
 - `nasm`
 - `qemu-system-i386`
-- `make`
 
 ```bash
 make build
@@ -45,36 +44,10 @@ Artifacts:
 - `out/kernel.bin`
 - `out/silver.img`
 
-## Run (Linux/macOS)
+## Run
 
 ```bash
 make run
-```
-
-## Build on Windows
-
-### Option A: WSL (recommended)
-Use Ubuntu (or similar) in WSL and run the same commands as Linux:
-
-```bash
-sudo apt update
-sudo apt install -y nasm qemu-system-x86 make
-make build
-make run
-```
-
-### Option B: Native PowerShell
-1. Install **NASM** and **QEMU** and add both to your `PATH`.
-2. From repository root, run:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\build_windows.ps1
-```
-
-To build and run immediately:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\build_windows.ps1 -Run
 ```
 
 ## Next steps toward a modern OS
