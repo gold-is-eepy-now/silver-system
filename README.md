@@ -1,22 +1,59 @@
-# Silver System OS – Modules
+# Silver System OS
 
-## Graphical Desktop
-Sets VGA 320x200 mode, draws window and prints title.
+Silver System now boots into a **real VGA graphical desktop** (320x200x256, Mode 13h) with a panel-style launcher and windowed apps inspired by classic desktop OS layouts.
 
-## FAT12 File Reading
-Stub: calls BIOS to read sector. For real FAT logic, see [OSDev FAT](https://wiki.osdev.org/FAT).
+> This remains an educational 16-bit real-mode x86 OS prototype.
 
-## Multitasking (Cooperative)
-Simple stub; for preemptive multitasking expand with PIC/Timer interrupts.
+## Implemented components
 
-## How to Build
+- **Bootloader** (`bootloader/boot.asm`)
+  - BIOS stage-1 loader.
+  - Initializes segment/stack state.
+  - Loads 40 sectors of kernel image at `0000:8000`.
 
-Assemble each `.asm` with NASM, combine for bootable disk.
+- **Kernel GUI** (`kernel/kernel.asm`)
+  - Switches to VGA Mode 13h.
+  - Draws a gradient wallpaper, left icon rail, taskbar, start button, and central control-panel window.
+  - Renders app tiles and hotkey help on desktop.
 
+- **Desktop apps**
+  - **Terminal** (`T`): commands `help`, `tasks`, `echo TEXT`, `desktop`, `reboot`.
+  - **Task Manager** (`M`): process list popup.
+  - **Notes** (`N`): simple typing pad popup, ESC to exit.
+
+## Controls
+
+- `T` Terminal
+- `M` Task Manager
+- `N` Notes
+- `D` Redraw desktop
+- `ESC` Reboot
+
+## Build
+
+Requirements:
+- `nasm`
+- `qemu-system-i386`
+
+```bash
+make build
 ```
-nasm -f bin bootloader/boot.asm -o bootloader/boot.bin
-nasm -f bin kernel/kernel.asm -o kernel/kernel.bin
-nasm -f bin desktop/desktop.asm -o desktop/desktop.bin
-nasm -f bin drivers/disk.asm -o drivers/disk.bin
-nasm -f bin kernel/multitask.asm -o kernel/multitask.bin
+
+Artifacts:
+- `out/boot.bin`
+- `out/kernel.bin`
+- `out/silver.img`
+
+## Run
+
+```bash
+make run
 ```
+
+## Next steps toward a modern OS
+
+1. Protected mode + GDT/IDT.
+2. Hardware timer and preemptive scheduler.
+3. Filesystem-backed app loading.
+4. Mouse cursor, event loop, and proper GUI widgets.
+5. User/kernel separation and syscall ABI.
